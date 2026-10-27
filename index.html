@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Pengesanan Tugasan</title>
+  <style>
+    /* ── CSS Variables ── */
+    :root {
+      --bg:          #f7f8fa;
+      --surface:     #ffffff;
+      --border:      #e5e7eb;
+      --text:        #1f2328;
+      --muted:       #57606a;
+      --blue:        #3b82d4;
+      --blue-bg:     #dbeafe;
+      --green:       #16a34a;
+      --green-bg:    #dcfce7;
+      --red:         #dc2626;
+      --red-bg:      #fee2e2;
+      --amber:       #d97706;
+      --amber-bg:    #fef3c7;
+      --font:        -apple-system, "Segoe UI", system-ui, sans-serif;
+      --radius:      10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.6;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    header h1 { font-size: 22px; font-weight: 700; }
+    header .meta { font-size: 13px; color: var(--muted); }
+    header .meta strong { color: var(--text); }
+
+    /* ── Main ── */
+    main {
+      max-width: 960px;
+      margin: 32px auto;
+      padding: 0 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ── Cards ── */
+    .cards-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 600px) {
+      .cards-row { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .card-icon { font-size: 24px; line-height: 1; }
+    .card-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .card-metric { font-size: 32px; font-weight: 800; line-height: 1.1; }
+    .card-metric.blue  { color: var(--blue); }
+    .card-metric.green { color: var(--green); }
+    .card-metric.red   { color: var(--red); }
+    .card-detail { font-size: 13px; color: var(--muted); }
+
+    /* ── Filter Buttons ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .filter-bar span {
+      font-size: 13px;
+      color: var(--muted);
+      margin-right: 4px;
+    }
+    .btn-filter {
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--muted);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .btn-filter:hover { background: var(--bg); }
+    .btn-filter.active-all   { background: var(--blue-bg);  color: var(--blue);  border-color: var(--blue);  }
+    .btn-filter.active-sudah { background: var(--green-bg); color: var(--green); border-color: var(--green); }
+    .btn-filter.active-belum { background: var(--red-bg);   color: var(--red);   border-color: var(--red);   }
+
+    /* ── Table ── */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    thead {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    thead th {
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.1s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--bg); }
+    tbody td { padding: 11px 16px; vertical-align: middle; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-green { background: var(--green-bg); color: var(--green); }
+    .badge-red   { background: var(--red-bg);   color: var(--red);   }
+
+    .no-results {
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      padding: 18px 0 24px;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header>
+    <div>
+      <h1>Dashboard Pengesanan Tugasan</h1>
+      <p class="meta">Kelas: <strong>DIT 2A</strong> &nbsp;&middot;&nbsp; Tugasan: <strong>Tugasan 1 – Asas Pengaturcaraan</strong> &nbsp;&middot;&nbsp; Tarikh Akhir: <strong>30 Jun 2025</strong></p>
+    </div>
+    <div class="meta">Dikemaskini: 25 Jun 2025, 10:00 PG</div>
+  </header>
+
+  <main>
+
+    <!-- ── Summary Cards ── -->
+    <div class="cards-row">
+      <div class="card">
+        <div class="card-icon">&#x1F4DA;</div>
+        <div class="card-label">Jumlah Pelajar</div>
+        <div class="card-metric blue" id="count-total">30</div>
+        <div class="card-detail">Kelas DIT 2A &mdash; Sesi 2025</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#x2705;</div>
+        <div class="card-label">Sudah Menghantar</div>
+        <div class="card-metric green" id="count-sudah">0</div>
+        <div class="card-detail" id="pct-sudah">0% kadar penghantaran</div>
+      </div>
+      <div class="card">
+        <div class="card-icon">&#x274C;</div>
+        <div class="card-label">Belum Menghantar</div>
+        <div class="card-metric red" id="count-belum">0</div>
+        <div class="card-detail" id="pct-belum">0% masih belum hantar</div>
+      </div>
+    </div>
+
+    <!-- ── Filter Bar ── -->
+    <div class="filter-bar">
+      <span>Tapis:</span>
+      <button class="btn-filter active-all" data-filter="semua">Semua</button>
+      <button class="btn-filter" data-filter="sudah">Sudah Hantar</button>
+      <button class="btn-filter" data-filter="belum">Belum Hantar</button>
+    </div>
+
+    <!-- ── Table ── -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Nama Pelajar</th>
+            <th>No. Matrik</th>
+            <th>Tugasan</th>
+            <th>Status</th>
+            <th>Tarikh Hantar</th>
+          </tr>
+        </thead>
+        <tbody id="student-tbody"></tbody>
+      </table>
+      <div class="no-results" id="no-results" style="display:none;">Tiada rekod dijumpai.</div>
+    </div>
+
+  </main>
+
+  <footer>Made with IBM Bob</footer>
+
+  <script>
+    // ── Sample Data ──
+    const students = [
+      { no: 1,  nama: "Ahmad Zulkifli bin Azman",    matrik: "DIT240001", tugasan: "Tugasan 1", status: "sudah", tarikh: "18 Jun 2025" },
+      { no: 2,  nama: "Siti Nuraini binti Hamdan",   matrik: "DIT240002", tugasan: "Tugasan 1", status: "sudah", tarikh: "19 Jun 2025" },
+      { no: 3,  nama: "Muhammad Hafiz bin Roslan",   matrik: "DIT240003", tugasan: "Tugasan 1", status: "belum", tarikh: "—" },
+      { no: 4,  nama: "Nur Aisyah binti Kamarudin",  matrik: "DIT240004", tugasan: "Tugasan 1", status: "sudah", tarikh: "20 Jun 2025" },
+      { no: 5,  nama: "Farhan Idris bin Sulaiman",   matrik: "DIT240005", tugasan: "Tugasan 1", status: "belum", tarikh: "—" },
+      { no: 6,  nama: "Nurul Hidayah binti Othman",  matrik: "DIT240006", tugasan: "Tugasan 1", status: "sudah", tarikh: "17 Jun 2025" },
+      { no: 7,  nama: "Amirul Hakim bin Yusoff",     matrik: "DIT240007", tugasan: "Tugasan 1", status: "sudah", tarikh: "21 Jun 2025" },
+      { no: 8,  nama: "Farah Najwa binti Zainudin",  matrik: "DIT240008", tugasan: "Tugasan 1", status: "sudah", tarikh: "22 Jun 2025" },
+      { no: 9,  nama: "Haziq Danial bin Mahmod",     matrik: "DIT240009", tugasan: "Tugasan 1", status: "belum", tarikh: "—" },
+      { no: 10, nama: "Liyana binti Abdul Razak",    matrik: "DIT240010", tugasan: "Tugasan 1", status: "sudah", tarikh: "20 Jun 2025" },
+      { no: 11, nama: "Irfan Hakimi bin Nordin",     matrik: "DIT240011", tugasan: "Tugasan 1", status: "sudah", tarikh: "19 Jun 2025" },
+      { no: 12, nama: "Syafiqah binti Mohamad",      matrik: "DIT240012", tugasan: "Tugasan 1", status: "belum", tarikh: "—" },
+      { no: 13, nama: "Zulaikha binti Ramli",        matrik: "DIT240013", tugasan: "Tugasan 1", status: "sudah", tarikh: "21 Jun 2025" },
+      { no: 14, nama: "Khairul Azwan bin Hassan",    matrik: "DIT240014", tugasan: "Tugasan 1", status: "sudah", tarikh: "18 Jun 2025" },
+      { no: 15, nama: "Nabilah binti Ismail",        matrik: "DIT240015", tugasan: "Tugasan 1", status: "belum", tarikh: "—" },
+      { no: 16, nama: "Izzatul Iman binti Zakaria",  matrik: "DIT240016", tugasan: "Tugasan 1", status: "sudah", tarikh: "22 Jun 2025" },
+      { no: 17, nama: "Ridhwan bin Mahmud",          matrik: "DIT240017", tugasan: "Tugasan 1", status: "sudah", tarikh: "20 Jun 2025" },
+      { no: 18, nama: "Hanis Nadhirah binti Aziz",   matrik: "DIT240018", tugasan: "Tugasan 1", status: "sudah", tarikh: "19 Jun 2025" },
+      { no: 19, nama: "Faris Ikhwan bin Zulkarnain", matrik: "DIT240019", tugasan: "Tugasan 1", status: "belum", tarikh: "—" },
+      { no: 20, nama: "Atiqah binti Mohd Noor",      matrik: "DIT240020", tugasan: "Tugasan 1", status: "sudah", tarikh: "21 Jun 2025" },
+      { no: 21, nama: "Shahril Aiman bin Saad",      matrik: "DIT240021", tugasan: "Tugasan 1", status: "sudah", tarikh: "23 Jun 2025" },
+      { no: 22, nama: "Nurul Syazwani binti Ghani",  matrik: "DIT240022", tugasan: "Tugasan 1", status: "sudah", tarikh: "18 Jun 2025" },
+      { no: 23, nama: "Hafizuddin bin Alias",        matrik: "DIT240023", tugasan: "Tugasan 1", status: "belum", tarikh: "—" },
+      { no: 24, nama: "Norzafirah binti Zulkifli",   matrik: "DIT240024", tugasan: "Tugasan 1", status: "sudah", tarikh: "20 Jun 2025" },
+      { no: 25, nama: "Azri Hakimi bin Baharom",     matrik: "DIT240025", tugasan: "Tugasan 1", status: "sudah", tarikh: "22 Jun 2025" },
+      { no: 26, nama: "Siti Hajar binti Mustafa",    matrik: "DIT240026", tugasan: "Tugasan 1", status: "sudah", tarikh: "21 Jun 2025" },
+      { no: 27, nama: "Luqmanul Hakim bin Daud",     matrik: "DIT240027", tugasan: "Tugasan 1", status: "belum", tarikh: "—" },
+      { no: 28, nama: "Aina Mardhiah binti Saiful",  matrik: "DIT240028", tugasan: "Tugasan 1", status: "sudah", tarikh: "19 Jun 2025" },
+      { no: 29, nama: "Syamil Ariff bin Azhari",     matrik: "DIT240029", tugasan: "Tugasan 1", status: "sudah", tarikh: "23 Jun 2025" },
+      { no: 30, nama: "Nadia Insyirah binti Jamil",  matrik: "DIT240030", tugasan: "Tugasan 1", status: "belum", tarikh: "—" },
+    ];
+
+    // ── Render & Count ──
+    const tbody      = document.getElementById('student-tbody');
+    const noResults  = document.getElementById('no-results');
+    const cntSudah   = document.getElementById('count-sudah');
+    const cntBelum   = document.getElementById('count-belum');
+    const pctSudah   = document.getElementById('pct-sudah');
+    const pctBelum   = document.getElementById('pct-belum');
+
+    const sudah = students.filter(s => s.status === 'sudah').length;
+    const belum = students.filter(s => s.status === 'belum').length;
+    const total = students.length;
+
+    cntSudah.textContent = sudah;
+    cntBelum.textContent = belum;
+    pctSudah.textContent = Math.round(sudah / total * 100) + '% kadar penghantaran';
+    pctBelum.textContent = Math.round(belum / total * 100) + '% masih belum hantar';
+
+    function renderTable(filter) {
+      const filtered = filter === 'semua' ? students : students.filter(s => s.status === filter);
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        noResults.style.display = 'block';
+        return;
+      }
+      noResults.style.display = 'none';
+
+      filtered.forEach(s => {
+        const isSudah = s.status === 'sudah';
+        const tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + s.no + '</td>' +
+          '<td><strong>' + s.nama + '</strong></td>' +
+          '<td style="color:var(--muted);font-size:13px">' + s.matrik + '</td>' +
+          '<td>' + s.tugasan + '</td>' +
+          '<td><span class="badge ' + (isSudah ? 'badge-green' : 'badge-red') + '">' +
+            (isSudah ? '&#x2714; Sudah Hantar' : '&#x2715; Belum Hantar') +
+          '</span></td>' +
+          '<td style="font-size:13px;color:' + (isSudah ? 'var(--text)' : 'var(--muted)') + '">' + s.tarikh + '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    // ── Filter Buttons ──
+    const buttons = document.querySelectorAll('.btn-filter');
+    let activeFilter = 'semua';
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeFilter = btn.dataset.filter;
+        buttons.forEach(b => b.className = 'btn-filter');
+        if (activeFilter === 'semua')  btn.classList.add('active-all');
+        if (activeFilter === 'sudah') btn.classList.add('active-sudah');
+        if (activeFilter === 'belum') btn.classList.add('active-belum');
+        renderTable(activeFilter);
+      });
+    });
+
+    // ── Initial Render ──
+    renderTable('semua');
+  </script>
+
+</body>
+</html>
